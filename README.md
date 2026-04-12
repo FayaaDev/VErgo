@@ -19,7 +19,9 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/FayaaDev/power10k/main/t
 - `eza`
 - `zoxide`
 - `fzf`
+- `wezterm` (macOS only — cask)
 - your exact `~/.p10k.zsh`
+- your exact `~/.wezterm.lua`
 - a portable `~/.zshrc` for macOS or Ubuntu
 - Meslo Nerd Font files
 
@@ -58,9 +60,10 @@ Registers Aerospace.app as a login item but does **not** launch it during instal
 
 ## Repository layout
 
-- `terminal.sh`: terminal bootstrap installer (zsh, zi, powerlevel10k, fonts)
+- `terminal.sh`: terminal bootstrap installer (zsh, zi, powerlevel10k, wezterm, fonts)
 - `aerospace.sh`: macOS window manager installer (aerospace, sketchybar, borders)
 - `files/.p10k.zsh`: exact prompt config
+- `files/.wezterm.lua`: exact WezTerm config
 - `files/.config/aerospace/`: aerospace tiling WM config
 - `files/.config/sketchybar/`: sketchybar status bar config (items, plugins, tokyonight theme)
 - `files/.config/borders/`: JankyBorders window border config

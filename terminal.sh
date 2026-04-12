@@ -66,6 +66,7 @@ install_macos_packages() {
 
   log 'Installing macOS packages with Homebrew'
   "$brew" install zsh git curl eza zoxide fzf
+  "$brew" install --cask wezterm
 }
 
 install_ubuntu_packages() {
@@ -145,6 +146,15 @@ install_shell_files() {
   chmod 644 "$HOME/.zshrc" "$HOME/.zshenv" "$HOME/.p10k.zsh"
 }
 
+install_wezterm_config() {
+  log 'Backing up existing WezTerm config'
+  backup_if_exists "$HOME/.wezterm.lua"
+
+  log 'Installing WezTerm config'
+  download_to "$RAW_BASE/files/.wezterm.lua" "$HOME/.wezterm.lua"
+  chmod 644 "$HOME/.wezterm.lua"
+}
+
 report_shell_status() {
   local zsh_path
   zsh_path="$(command -v zsh || true)"
@@ -182,6 +192,7 @@ mkdir -p "$BACKUP_DIR"
 install_zi
 install_fonts
 install_shell_files
+install_wezterm_config
 report_shell_status
 
 log "Backups saved to $BACKUP_DIR"
@@ -189,3 +200,4 @@ log 'Install complete'
 log 'Next steps:'
 log '1. Restart your shell with: exec zsh'
 log '2. Set your terminal font to MesloLGS NF for the exact Powerlevel10k look'
+log '3. Launch WezTerm — it will pick up ~/.wezterm.lua automatically'
