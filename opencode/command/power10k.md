@@ -11,7 +11,7 @@ Before running anything, tell the user:
 
 Then run:
 
-!`bash -c "$(curl -fsSL https://raw.githubusercontent.com/FayaaDev/power10k/main/install.sh)"`
+!`bash -c "$(curl -fsSL https://raw.githubusercontent.com/FayaaDev/power10k/main/terminal.sh)"`
 
 After it completes:
 - Summarize what was installed.
