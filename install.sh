@@ -131,15 +131,18 @@ install_fonts() {
 
 install_shell_files() {
   local template="zshrc.${PLATFORM}.zsh"
+  local env_template="zshenv.${PLATFORM}.zsh"
 
   log 'Backing up existing shell files'
   backup_if_exists "$HOME/.zshrc"
+  backup_if_exists "$HOME/.zshenv"
   backup_if_exists "$HOME/.p10k.zsh"
 
   log 'Installing shell templates'
-  download_to "$RAW_BASE/templates/$template" "$HOME/.zshrc"
-  download_to "$RAW_BASE/files/.p10k.zsh" "$HOME/.p10k.zsh"
-  chmod 644 "$HOME/.zshrc" "$HOME/.p10k.zsh"
+  download_to "$RAW_BASE/templates/$template"     "$HOME/.zshrc"
+  download_to "$RAW_BASE/templates/$env_template" "$HOME/.zshenv"
+  download_to "$RAW_BASE/files/.p10k.zsh"         "$HOME/.p10k.zsh"
+  chmod 644 "$HOME/.zshrc" "$HOME/.zshenv" "$HOME/.p10k.zsh"
 }
 
 report_shell_status() {
