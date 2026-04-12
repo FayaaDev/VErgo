@@ -1,0 +1,66 @@
+# Enable Powerlevel10k instant prompt. Keep near the top of ~/.zshrc.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+typeset -A ZI
+ZI[BIN_DIR]="${HOME}/.zi/bin"
+source "${ZI[BIN_DIR]}/zi.zsh"
+
+# Keep the plugin manager available after zoxide takes over `zi`.
+functions[ziplugin]=$functions[zi]
+
+if [[ -d "$HOME/.docker/completions" ]]; then
+  fpath=("$HOME/.docker/completions" $fpath)
+fi
+
+# Completions need to be available before compinit runs.
+ziplugin light zsh-users/zsh-completions
+
+autoload -Uz compinit
+compinit
+
+autoload -Uz _zi
+(( ${+_comps} )) && _comps[ziplugin]=_zi
+
+ziplugin light romkatv/powerlevel10k
+ziplugin light zsh-users/zsh-autosuggestions
+
+alias ls="eza --icons=always"
+eval "$(zoxide init zsh)"
+alias cd="z"
+
+alias pip="python3 -m pip"
+alias pip3="python3 -m pip"
+
+export PATH="$PATH:$HOME/.local/bin"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
+
+[ -d "$HOME/.antigravity/antigravity/bin" ] && export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
+
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+[ -d "$HOME/.opencode/bin" ] && export PATH="$HOME/.opencode/bin:$PATH"
+
+for android_sdk in "$HOME/Android/Sdk" "$HOME/Android/sdk"; do
+  if [[ -d "$android_sdk" ]]; then
+    export ANDROID_SDK_ROOT="$android_sdk"
+    export ANDROID_HOME="$ANDROID_SDK_ROOT"
+    export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_SDK_ROOT/emulator:$PATH"
+    break
+  fi
+done
+
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+if command -v openclaw >/dev/null 2>&1; then
+  source <(openclaw completion --shell zsh 2>/dev/null)
+fi
+
+# Keep syntax highlighting last so it sees the final widget state.
+ziplugin light zdharma-continuum/fast-syntax-highlighting
