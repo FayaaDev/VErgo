@@ -1,4 +1,4 @@
-# power10k
+# VErgo
 
 Fayaa's portable terminal bootstrap for macOS and Ubuntu.
 
