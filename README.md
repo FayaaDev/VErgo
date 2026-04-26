@@ -5,7 +5,7 @@ Fayaa's portable terminal bootstrap for macOS and Ubuntu.
 ## One-line install
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/FayaaDev/power10k/main/terminal.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/FayaaDev/VErgo/main/terminal.sh)"
 ```
 
 ## What it installs
@@ -51,7 +51,7 @@ On top of the base terminal setup, a second installer ships Fayaa's tiling WM st
 [aerospace](https://github.com/nikitabobko/AeroSpace) + [sketchybar](https://github.com/FelixKratz/SketchyBar) + [JankyBorders](https://github.com/FelixKratz/JankyBorders), themed with tokyonight.
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/FayaaDev/power10k/main/aerospace.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/FayaaDev/VErgo/main/aerospace.sh)"
 ```
 
 Installs: `aerospace` (cask), `sketchybar`, `borders`, `font-sf-pro`, `font-jetbrains-mono-nerd-font`.
