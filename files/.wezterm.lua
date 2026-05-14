@@ -42,6 +42,9 @@ end
 config.max_fps = 240
 config.animation_fps = 240
 
+-- Show WezTerm tab bar (compact, numbers-only).
+config.enable_tab_bar = true
+
 -- Custom Configuration
 local tab_style = "square"
 local leader_prefix = wezterm.nerdfonts.fa_apple -- Apple logo
@@ -97,9 +100,9 @@ local scheme_colors = {
 
 local colors = {
     --border = scheme_colors.catppuccin.macchiato.teal,
-    tab_bar_active_tab_fg = scheme_colors.catppuccin.macchiato.crimson,
     tab_bar_active_tab_bg = scheme_colors.catppuccin.macchiato.crimson,
     tab_bar_text = scheme_colors.catppuccin.macchiato.crust,
+    tab_bar_sep = scheme_colors.catppuccin.macchiato.lavender,
     arrow_foreground_leader = scheme_colors.catppuccin.macchiato.crimson,
     arrow_background_leader = scheme_colors.catppuccin.macchiato.crimson,
 }
@@ -110,6 +113,9 @@ Border
 ============================
 ]]
 config.window_frame = {
+    -- The tab bar uses window_frame font settings; keep it smaller than the main terminal font.
+    font = wezterm.font_with_fallback({ 'MesloLGS Nerd Font', "Maple Mono NF", "JetBrains Mono NL" }),
+    font_size = 13,
     border_left_width = "0.4cell",
     border_right_width = "0.4cell",
     border_bottom_height = "0.15cell",
@@ -143,7 +149,7 @@ config.keys = {
 
     {
         mods = "LEADER",
-        key = "v",
+        key = "r",
         action = act.PromptInputLine {
             description = "Rename current tab",
             action = wezterm.action_callback(function(window, pane, line)
@@ -165,6 +171,11 @@ config.keys = {
         mods = "LEADER",
         key = "q",
         action = wezterm.action.CloseCurrentPane { confirm = false }
+    },
+    {
+        mods = "LEADER",
+        key = "Escape",
+        action = act.ResetTerminal,
     },
     {
         mods = "LEADER",
@@ -191,16 +202,6 @@ config.keys = {
         key = "b",
         action = wezterm.action.ActivatePaneDirection "Left"
     },
-    -- {
-    --     mods = "LEADER",
-    --     key = "",
-    --     action = wezterm.action.ActivatePaneDirection "Down"
-    -- },
-    -- {
-    --     mods = "LEADER",
-    --     key = "",
-    --     waction = wezterm.action.ActivatePaneDirection "Up"
-    -- },
     {
         mods = "LEADER",
         key = "n",
@@ -242,46 +243,43 @@ end
 Tab Bar
 ============================
 ]]
+-- Always show the bar; otherwise it disappears when only one tab exists.
 config.hide_tab_bar_if_only_one_tab = false
-config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false
 config.tab_and_split_indices_are_zero_based = true
 
-local function tab_title(tab_info)
-    local title = tab_info.tab_title
-    if title and #title > 0 then
-        return title
-    end
-    return tab_info.active_pane.title
-end
+-- Keep the bar visually minimal.
+config.show_new_tab_button_in_tab_bar = false
+config.tab_bar_at_bottom = false
+
+-- Keep tabs narrow/compact.
+config.tab_max_width = 6
 
 wezterm.on(
     "format-tab-title",
     function(tab, tabs, panes, config, hover, max_width)
-        local title = " " .. tab.tab_index .. ": " .. tab_title(tab) .. " "
-        local left_edge_text = ""
-        local right_edge_text = ""
+        -- Numbers-only, compact: no tab titles/names.
+        local label = tostring(tab.tab_index)
+        local is_last = tab.tab_index == (#tabs - 1)
+        local sep = is_last and "" or "│"
+        local title = " " .. label .. " "
 
-        if tab_style == "rounded" then
-            title = tab.tab_index .. ": " .. tab_title(tab)
-            title = wezterm.truncate_right(title, max_width - 2)
-            left_edge_text = wezterm.nerdfonts.ple_left_half_circle_thick
-            right_edge_text = wezterm.nerdfonts.ple_right_half_circle_thick
-        end
-
+        -- Always return a value; otherwise wezterm will fall back to defaults.
         if tab.is_active then
             return {
                 { Background = { Color = colors.tab_bar_active_tab_bg } },
-                { Foreground = { Color = colors.tab_bar_active_tab_fg } },
-                { Text = left_edge_text },
-                { Background = { Color = colors.tab_bar_active_tab_fg } },
                 { Foreground = { Color = colors.tab_bar_text } },
                 { Text = title },
-                { Background = { Color = colors.tab_bar_active_tab_bg } },
-                { Foreground = { Color = colors.tab_bar_active_tab_fg } },
-                { Text = right_edge_text },
+                { Foreground = { Color = colors.tab_bar_sep } },
+                { Text = sep },
             }
         end
+
+        return {
+            { Text = title },
+            { Foreground = { Color = colors.tab_bar_sep } },
+            { Text = sep },
+        }
     end
 )
 
