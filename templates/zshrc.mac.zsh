@@ -45,6 +45,10 @@ fi
 
 alias pip="python3 -m pip"
 alias pip3="python3 -m pip"
+alias vim="nvim"
+
+export EDITOR="nvim"
+export VISUAL="nvim"
 
 export NVM_DIR="$HOME/.nvm"
 if [[ -o interactive ]]; then
@@ -54,6 +58,14 @@ if [[ -o interactive ]]; then
   [[ -s "$HOME/.bun/_bun" ]] && source "$HOME/.bun/_bun"
 
   [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+  _disable_terminal_mouse_reporting() {
+    [[ -t 1 ]] || return
+    printf '\e[?1000l\e[?1002l\e[?1003l\e[?1005l\e[?1006l\e[?1015l'
+  }
+
+  autoload -Uz add-zsh-hook
+  add-zsh-hook precmd _disable_terminal_mouse_reporting
 fi
 
 if [[ -o interactive ]] && command -v openclaw >/dev/null 2>&1; then
@@ -96,3 +108,33 @@ fi
 if [[ -o interactive ]]; then
   ziplugin light zdharma-continuum/fast-syntax-highlighting
 fi
+
+# --- user overlay ---
+[[ -f "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"   # pipx
+
+# gws: prefer encrypted credential store over OAuth client_secret.json
+if [[ "${GOOGLE_WORKSPACE_CLI_CREDENTIALS_FILE:-}" == "$HOME/.config/gws/client_secret.json" ]]; then
+  unset GOOGLE_WORKSPACE_CLI_CREDENTIALS_FILE
+fi
+
+## beads dolt credentials
+export DOLT_REMOTE_USER="fayaadev"
+if [[ -z "${DOLT_REMOTE_PASSWORD:-}" && -f "$HOME/.config/beads/dolt.env" ]]; then
+  . "$HOME/.config/beads/dolt.env"
+fi
+# Beads helpers
+beads_pullpush() {
+  bd dolt pull --json && bd dolt push --json
+}
+beads_start() {
+  bd dolt pull --json && bd ready --json
+}
+beads_end() {
+  bd dolt push --json
+}
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/fayaamini/projy/aiterminal/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/fayaamini/projy/aiterminal/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/fayaamini/projy/aiterminal/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/fayaamini/projy/aiterminal/google-cloud-sdk/completion.zsh.inc'; fi

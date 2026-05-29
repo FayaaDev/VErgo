@@ -2,21 +2,21 @@
 
 set -euo pipefail
 
-OWNER="${POWER10K_REPO_OWNER:-FayaaDev}"
-REPO="${POWER10K_REPO_NAME:-power10k}"
-BRANCH="${POWER10K_REPO_BRANCH:-main}"
-RAW_BASE="${POWER10K_RAW_BASE:-https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}}"
+OWNER="${VERGO_REPO_OWNER:-${POWER10K_REPO_OWNER:-FayaaDev}}"
+REPO="${VERGO_REPO_NAME:-${POWER10K_REPO_NAME:-VErgo}}"
+BRANCH="${VERGO_REPO_BRANCH:-${POWER10K_REPO_BRANCH:-main}}"
+RAW_BASE="${VERGO_RAW_BASE:-${POWER10K_RAW_BASE:-https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}}}"
 
 log() {
-  printf '[aerospace] %s\n' "$*"
+  printf '[vergo-aerospace] %s\n' "$*"
 }
 
 warn() {
-  printf '[aerospace] WARNING: %s\n' "$*" >&2
+  printf '[vergo-aerospace] WARNING: %s\n' "$*" >&2
 }
 
 die() {
-  printf '[aerospace] ERROR: %s\n' "$*" >&2
+  printf '[vergo-aerospace] ERROR: %s\n' "$*" >&2
   exit 1
 }
 
@@ -47,7 +47,7 @@ ensure_homebrew() {
   NONINTERACTIVE=1 bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 }
 
-backup_dir_if_exists() {
+backup_path_if_exists() {
   local path="$1"
   if [ -e "$path" ]; then
     cp -a "$path" "$BACKUP_DIR/$(basename "$path")"
@@ -66,15 +66,16 @@ brew="$(brew_cmd)"
 log 'Installing packages with Homebrew'
 "$brew" install --cask nikitabobko/tap/aerospace
 "$brew" install FelixKratz/formulae/sketchybar FelixKratz/formulae/borders
-"$brew" install --cask font-sf-pro font-jetbrains-mono-nerd-font
+"$brew" install --cask font-sf-pro font-jetbrains-mono font-jetbrains-mono-nerd-font karabiner-elements
 
-BACKUP_DIR="$HOME/.backup-power10k/$(date +%Y%m%d%H%M%S)"
+BACKUP_DIR="$HOME/.backup-vergo/$(date +%Y%m%d%H%M%S)"
 mkdir -p "$BACKUP_DIR"
 
 log 'Backing up existing window-manager configs'
-backup_dir_if_exists "$HOME/.config/aerospace"
-backup_dir_if_exists "$HOME/.config/sketchybar"
-backup_dir_if_exists "$HOME/.config/borders"
+backup_path_if_exists "$HOME/.config/aerospace"
+backup_path_if_exists "$HOME/.config/sketchybar"
+backup_path_if_exists "$HOME/.config/borders"
+backup_path_if_exists "$HOME/.config/karabiner/karabiner.json"
 
 log 'Downloading configs'
 
@@ -82,6 +83,7 @@ log 'Downloading configs'
 config_files=(
   'aerospace/aerospace.toml'
   'borders/bordersrc'
+  'karabiner/karabiner.json'
   'sketchybar/sketchybarrc'
   'sketchybar/environment'
   'sketchybar/items/aerospace'
@@ -107,6 +109,8 @@ chmod +x \
   "$HOME/.config/sketchybar/plugins/clock" \
   "$HOME/.config/sketchybar/plugins/front_app" \
   "$HOME/.config/borders/bordersrc"
+
+chmod 644 "$HOME/.config/karabiner/karabiner.json"
 
 log 'Registering Aerospace as a login item'
 osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Applications/Aerospace.app", hidden:false}' \

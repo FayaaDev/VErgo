@@ -8,6 +8,7 @@ typeset -U path PATH
 [[ -d "$HOME/.bun/bin"                     ]] && path=("$HOME/.bun/bin"                     $path)
 [[ -d "$HOME/.opencode/bin"                ]] && path=("$HOME/.opencode/bin"                $path)
 [[ -d "$HOME/.antigravity/antigravity/bin" ]] && path=("$HOME/.antigravity/antigravity/bin" $path)
+[[ -d "$HOME/projy/aiterminal/google-cloud-sdk/bin" ]] && path=("$HOME/projy/aiterminal/google-cloud-sdk/bin" $path)
 
 # Android SDK (macOS convention: ~/Library/Android/sdk).
 if [[ -d "$HOME/Library/Android/sdk" ]]; then
@@ -17,3 +18,8 @@ if [[ -d "$HOME/Library/Android/sdk" ]]; then
 fi
 
 export BUN_INSTALL="$HOME/.bun"
+export PYTHONUSERBASE="$HOME/.local"
+
+[[ -d "/Applications/Obsidian.app/Contents/MacOS" ]] && path+=("/Applications/Obsidian.app/Contents/MacOS")
+
+[[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"

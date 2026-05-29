@@ -27,7 +27,8 @@
 --    - LEADER + h/j/k/l: Move left/down/up/right
 --
 -- 4. Pane Resizing:
---    - LEADER + Arrow Keys: Adjust pane size by 5 units
+--    - LEADER + Shift + H/J/K/L: Adjust pane size by 5 units
+--    - LEADER + Shift + Arrow Keys: Adjust pane size by 5 units
 
 local wezterm = require "wezterm"
 local act = wezterm.action
@@ -54,8 +55,18 @@ local leader_prefix = wezterm.nerdfonts.fa_apple -- Apple logo
 Font
 ============================
 ]]
-config.font = wezterm.font_with_fallback({ 'MesloLGS Nerd Font', "Maple Mono NF", "JetBrains Mono NL" })
-config.font_size = 20
+config.font = wezterm.font_with_fallback({
+    { family = 'JetBrains Mono', weight = 'Bold', italic = false },
+    { family = 'Noto Naskh Arabic' },
+    { family = 'Noto Sans Arabic' },
+    { family = 'Geeza Pro' },
+    { family = 'Al Bayan' },
+    { family = 'Baghdad' },
+})
+config.font_size = 22
+config.bidi_enabled = true
+config.bidi_direction = 'AutoLeftToRight'
+config.line_height = 1.15
 
 --[[
 ============================
@@ -179,6 +190,16 @@ config.keys = {
     },
     {
         mods = "LEADER",
+        key = "h",
+        action = wezterm.action.ActivateWindowRelative(-1)
+    },
+    {
+        mods = "LEADER",
+        key = "l",
+        action = wezterm.action.ActivateWindowRelative(1)
+    },
+    {
+        mods = "LEADER",
         key = "LeftArrow",
         action = wezterm.action.ActivateTabRelative(-1)
     },
@@ -208,35 +229,61 @@ config.keys = {
         action = wezterm.action.ActivatePaneDirection "Right"
     },
     {
-        mods = "LEADER",
+        mods = "LEADER|SHIFT",
         key = "h",
         action = wezterm.action.AdjustPaneSize { "Left", 5 }
     },
     {
-        mods = "LEADER",
+        mods = "LEADER|SHIFT",
         key = "j",
+        action = wezterm.action.AdjustPaneSize { "Down", 5 }
+    },
+    {
+        mods = "LEADER|SHIFT",
+        key = "k",
+        action = wezterm.action.AdjustPaneSize { "Up", 5 }
+    },
+    {
+        mods = "LEADER|SHIFT",
+        key = "l",
         action = wezterm.action.AdjustPaneSize { "Right", 5 }
     },
     {
-        mods = "LEADER",
+        mods = "LEADER|SHIFT",
+        key = "LeftArrow",
+        action = wezterm.action.AdjustPaneSize { "Left", 5 }
+    },
+    {
+        mods = "LEADER|SHIFT",
+        key = "RightArrow",
+        action = wezterm.action.AdjustPaneSize { "Right", 5 }
+    },
+    {
+        mods = "LEADER|SHIFT",
         key = "DownArrow",
         action = wezterm.action.AdjustPaneSize { "Down", 5 }
     },
     {
-        mods = "LEADER",
+        mods = "LEADER|SHIFT",
         key = "UpArrow",
         action = wezterm.action.AdjustPaneSize { "Up", 5 }
     },
 }
 
--- Leader + number to activate tabs 0-9
-for i = 0, 9 do
+-- Leader + number to activate tabs 1-9; 0 activates the 10th tab.
+for i = 1, 9 do
     table.insert(config.keys, {
         key = tostring(i),
         mods = "LEADER",
-        action = wezterm.action.ActivateTab(i),
+        action = wezterm.action.ActivateTab(i - 1),
     })
 end
+
+table.insert(config.keys, {
+    key = "0",
+    mods = "LEADER",
+    action = wezterm.action.ActivateTab(9),
+})
 
 --[[
 ============================
@@ -246,7 +293,7 @@ Tab Bar
 -- Always show the bar; otherwise it disappears when only one tab exists.
 config.hide_tab_bar_if_only_one_tab = false
 config.use_fancy_tab_bar = false
-config.tab_and_split_indices_are_zero_based = true
+config.tab_and_split_indices_are_zero_based = false
 
 -- Keep the bar visually minimal.
 config.show_new_tab_button_in_tab_bar = false
@@ -259,7 +306,7 @@ wezterm.on(
     "format-tab-title",
     function(tab, tabs, panes, config, hover, max_width)
         -- Numbers-only, compact: no tab titles/names.
-        local label = tostring(tab.tab_index)
+        local label = tostring(tab.tab_index + 1)
         local is_last = tab.tab_index == (#tabs - 1)
         local sep = is_last and "" or "│"
         local title = " " .. label .. " "
@@ -307,7 +354,7 @@ wezterm.on("update-status", function(window, _)
 
         if tab_style ~= "rounded" then
             for _, tab_info in ipairs(tabs) do
-                if tab_info.is_active and tab_info.index == 0 then
+                if tab_info.is_active and tab_info.index == 1 then
                     arrow_background = { Foreground = { Color = colors.tab_bar_active_tab_fg } }
                     solid_left_arrow = wezterm.nerdfonts.pl_right_hard_divider
                     break

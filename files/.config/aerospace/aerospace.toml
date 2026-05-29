@@ -96,10 +96,10 @@ if.app-id = 'com.apple.Safari.WebApp.38C031DC-CC9C-46FA-A959-7D71DC6B5C7F'
 run = "move-node-to-workspace B"
 
 [[on-window-detected]]
-if.app-id = 'ru.keepcoder.Telegram'
+if.app-id = 'com.tdesktop.Telegram'
 run = "move-node-to-workspace W"
 [[on-window-detected]]
-if.app-id = 'com.google.Chrome.app.hnpfjngllnobngcgfapefoaidbinmjnm'
+if.app-id = 'net.whatsapp.WhatsApp'
 run = "move-node-to-workspace W"
 
 
@@ -120,15 +120,17 @@ run = "move-node-to-workspace V"
 
 [[on-window-detected]]
 if.app-id = 'com.apple.finder'
-run = "move-node-to-workspace F"
-
-
-[[on-window-detected]]
-if.app-name-regex-substring = 'Finder'
-run = "layout floating"
+run = [
+  "move-node-to-workspace F",
+  "layout floating",
+]
 
 [[on-window-detected]]
 if.app-name-regex-substring = '1Password'
+run = "layout floating"
+
+[[on-window-detected]]
+if.window-title-regex-substring = 'dev.recordly.app'
 run = "layout floating"
 
 
@@ -159,11 +161,11 @@ preset = 'qwerty'
 
 # Open/focus apps using keybinds
 # See: https://nikitabobko.github.io/AeroSpace/commands#exec-and-forget
-cmd-alt-ctrl-shift-b = 'exec-and-forget open -a "Brave Browser.app"'
+cmd-alt-ctrl-shift-b = 'exec-and-forget open -a "Safari Browser.app"'
 
 # Switch between layouts
 # See: https://nikitabobko.github.io/AeroSpace/commands#layout
-alt-slash = 'layout tiles horizontal vertical'
+alt-shift-backslash = 'layout tiles horizontal vertical'
 alt-shift-slash = 'layout accordion horizontal vertical'
 
 # Toggle windows in and out of the tiling layout/floating
@@ -178,10 +180,10 @@ cmd-alt-ctrl-shift-enter = 'macos-native-fullscreen'
 
 # Switch window focus
 # See: https://nikitabobko.github.io/AeroSpace/commands#focus
-alt-p = 'focus right'
-alt-e = 'focus down'
-alt-i = 'focus up'
-alt-o = 'focus left'
+alt-h = 'focus right'
+alt-j = 'focus down'
+alt-k = 'focus up'
+alt-l = 'focus left'
 
 # Move windows in the given direction
 # See: https://nikitabobko.github.io/AeroSpace/commands#move

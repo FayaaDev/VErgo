@@ -1,6 +1,6 @@
 # VErgo
 
-Fayaa's portable terminal bootstrap for macOS and Ubuntu.
+Fayaa's portable shell, terminal, editor, and macOS desktop bootstrap.
 
 ## One-line install
 
@@ -19,16 +19,30 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/FayaaDev/VErgo/main/term
 - `eza`
 - `zoxide`
 - `fzf`
+- `gh`
+- `tmux`
+- `neovim`
+- `node`
+- `chezmoi`
+- `cloudflared`
+- `cocoapods`
+- `1password-cli`
 - `wezterm` (macOS only — cask)
+- `font-jetbrains-mono`
+- `font-jetbrains-mono-nerd-font`
 - your exact `~/.p10k.zsh`
+- your exact `~/.zprofile` (macOS)
 - your exact `~/.wezterm.lua`
+- your exact `~/.gitconfig`
+- your exact `~/.tmux.conf`
 - a portable `~/.zshrc` for macOS or Ubuntu
+- your exact curated `~/.config/nvim`
 - Meslo Nerd Font files
 
 ## Behavior
 
 - Supports macOS and Ubuntu-style Linux systems with `apt`
-- Backs up existing `~/.zshrc` and `~/.p10k.zsh` into `~/.backup-power10k/<timestamp>/`
+- Backs up managed files into `~/.backup-vergo/<timestamp>/`
 - Preserves optional integrations if they already exist on the machine:
   - `OpenClaw`
   - `bun`
@@ -47,24 +61,29 @@ If the prompt icons do not render correctly, set your terminal font to `MesloLGS
 
 ## macOS window manager (optional)
 
-On top of the base terminal setup, a second installer ships Fayaa's tiling WM stack:
+On top of the base terminal setup, a second installer ships Fayaa's tiling desktop stack:
 [aerospace](https://github.com/nikitabobko/AeroSpace) + [sketchybar](https://github.com/FelixKratz/SketchyBar) + [JankyBorders](https://github.com/FelixKratz/JankyBorders), themed with tokyonight.
 
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/FayaaDev/VErgo/main/aerospace.sh)"
 ```
 
-Installs: `aerospace` (cask), `sketchybar`, `borders`, `font-sf-pro`, `font-jetbrains-mono-nerd-font`.
+Installs: `aerospace` (cask), `sketchybar`, `borders`, `karabiner-elements`, `font-sf-pro`, `font-jetbrains-mono`, `font-jetbrains-mono-nerd-font`.
 
 Registers Aerospace.app as a login item but does **not** launch it during install — log out and back in, or run `open -a Aerospace` to start immediately. On first launch macOS will prompt for Accessibility permission (required for aerospace to manage windows).
 
 ## Repository layout
 
 - `terminal.sh`: terminal bootstrap installer (zsh, zi, powerlevel10k, wezterm, fonts)
-- `aerospace.sh`: macOS window manager installer (aerospace, sketchybar, borders)
+- `aerospace.sh`: macOS desktop installer (aerospace, sketchybar, borders, karabiner)
 - `files/.p10k.zsh`: exact prompt config
+- `files/.zprofile`: exact login shell config
 - `files/.wezterm.lua`: exact WezTerm config
+- `files/.gitconfig`: exact Git identity config
+- `files/.tmux.conf`: exact tmux config
+- `files/.config/nvim/`: curated Neovim config
 - `files/.config/aerospace/`: aerospace tiling WM config
+- `files/.config/karabiner/`: Karabiner key remap config
 - `files/.config/sketchybar/`: sketchybar status bar config (items, plugins, tokyonight theme)
 - `files/.config/borders/`: JankyBorders window border config
 - `templates/zshrc.mac.zsh`: macOS shell template
@@ -72,4 +91,4 @@ Registers Aerospace.app as a login item but does **not** launch it during instal
 
 ## Publishing
 
-The one-line install command expects these files to be pushed to the `main` branch of `FayaaDev/power10k`.
+The one-line install command expects these files to be pushed to the `main` branch of `FayaaDev/VErgo`.

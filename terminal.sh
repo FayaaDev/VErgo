@@ -2,21 +2,21 @@
 
 set -euo pipefail
 
-OWNER="${POWER10K_REPO_OWNER:-FayaaDev}"
-REPO="${POWER10K_REPO_NAME:-power10k}"
-BRANCH="${POWER10K_REPO_BRANCH:-main}"
-RAW_BASE="${POWER10K_RAW_BASE:-https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}}"
+OWNER="${VERGO_REPO_OWNER:-${POWER10K_REPO_OWNER:-FayaaDev}}"
+REPO="${VERGO_REPO_NAME:-${POWER10K_REPO_NAME:-VErgo}}"
+BRANCH="${VERGO_REPO_BRANCH:-${POWER10K_REPO_BRANCH:-main}}"
+RAW_BASE="${VERGO_RAW_BASE:-${POWER10K_RAW_BASE:-https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}}}"
 
 log() {
-  printf '[power10k] %s\n' "$*"
+  printf '[vergo] %s\n' "$*"
 }
 
 warn() {
-  printf '[power10k] WARNING: %s\n' "$*" >&2
+  printf '[vergo] WARNING: %s\n' "$*" >&2
 }
 
 die() {
-  printf '[power10k] ERROR: %s\n' "$*" >&2
+  printf '[vergo] ERROR: %s\n' "$*" >&2
   exit 1
 }
 
@@ -65,8 +65,8 @@ install_macos_packages() {
   brew="$(brew_cmd)"
 
   log 'Installing macOS packages with Homebrew'
-  "$brew" install zsh git curl eza zoxide fzf
-  "$brew" install --cask wezterm
+  "$brew" install zsh git curl eza zoxide fzf gh tmux neovim node chezmoi cloudflared cocoapods
+  "$brew" install --cask wezterm font-jetbrains-mono font-jetbrains-mono-nerd-font 1password-cli
 }
 
 install_ubuntu_packages() {
@@ -75,7 +75,7 @@ install_ubuntu_packages() {
 
   log 'Installing Ubuntu packages with apt'
   sudo apt-get update
-  sudo apt-get install -y zsh git curl eza zoxide fzf
+  sudo apt-get install -y zsh git curl eza zoxide fzf gh tmux neovim nodejs npm
 }
 
 install_zi() {
@@ -135,15 +135,28 @@ install_shell_files() {
   local env_template="zshenv.${PLATFORM}.zsh"
 
   log 'Backing up existing shell files'
+  if [ "$PLATFORM" = 'mac' ]; then
+    backup_if_exists "$HOME/.zprofile"
+  fi
   backup_if_exists "$HOME/.zshrc"
   backup_if_exists "$HOME/.zshenv"
   backup_if_exists "$HOME/.p10k.zsh"
+  backup_if_exists "$HOME/.gitconfig"
+  backup_if_exists "$HOME/.tmux.conf"
 
   log 'Installing shell templates'
+  if [ "$PLATFORM" = 'mac' ]; then
+    download_to "$RAW_BASE/files/.zprofile" "$HOME/.zprofile"
+  fi
   download_to "$RAW_BASE/templates/$template"     "$HOME/.zshrc"
   download_to "$RAW_BASE/templates/$env_template" "$HOME/.zshenv"
   download_to "$RAW_BASE/files/.p10k.zsh"         "$HOME/.p10k.zsh"
-  chmod 644 "$HOME/.zshrc" "$HOME/.zshenv" "$HOME/.p10k.zsh"
+  download_to "$RAW_BASE/files/.gitconfig"        "$HOME/.gitconfig"
+  download_to "$RAW_BASE/files/.tmux.conf"        "$HOME/.tmux.conf"
+  if [ "$PLATFORM" = 'mac' ]; then
+    chmod 644 "$HOME/.zprofile"
+  fi
+  chmod 644 "$HOME/.zshrc" "$HOME/.zshenv" "$HOME/.p10k.zsh" "$HOME/.gitconfig" "$HOME/.tmux.conf"
 }
 
 install_wezterm_config() {
@@ -153,6 +166,34 @@ install_wezterm_config() {
   log 'Installing WezTerm config'
   download_to "$RAW_BASE/files/.wezterm.lua" "$HOME/.wezterm.lua"
   chmod 644 "$HOME/.wezterm.lua"
+}
+
+install_nvim_config() {
+  local rel
+  local dest
+
+  log 'Backing up existing Neovim config'
+  backup_if_exists "$HOME/.config/nvim"
+
+  log 'Installing Neovim config'
+  for rel in \
+    'init.lua' \
+    'lazyvim.json' \
+    'lazy-lock.json' \
+    'stylua.toml' \
+    '.gitignore' \
+    '.neoconf.json' \
+    'lua/config/autocmds.lua' \
+    'lua/config/keymaps.lua' \
+    'lua/config/lazy.lua' \
+    'lua/config/options.lua' \
+    'lua/plugins/example.lua'
+  do
+    dest="$HOME/.config/nvim/$rel"
+    mkdir -p "$(dirname "$dest")"
+    download_to "$RAW_BASE/files/.config/nvim/$rel" "$dest"
+    chmod 644 "$dest"
+  done
 }
 
 report_shell_status() {
@@ -186,13 +227,14 @@ case "$(uname -s)" in
     ;;
 esac
 
-BACKUP_DIR="$HOME/.backup-power10k/$(date +%Y%m%d%H%M%S)"
+BACKUP_DIR="$HOME/.backup-vergo/$(date +%Y%m%d%H%M%S)"
 mkdir -p "$BACKUP_DIR"
 
 install_zi
 install_fonts
 install_shell_files
 install_wezterm_config
+install_nvim_config
 report_shell_status
 
 log "Backups saved to $BACKUP_DIR"
