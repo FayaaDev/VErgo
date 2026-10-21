@@ -14,7 +14,7 @@
 -- Keybindings:
 -- 1. Tab Management:
 --    - LEADER + c: Create a new tab
---    - LEADER + x: Close the current pane (with confirmation)
+--    - LEADER + x: Enter copy mode
 --    - LEADER + b: Switch to the previous tab
 --    - LEADER + n: Switch to the next tab
 --    - LEADER + <number>: Switch to a specific tab (0–9)
@@ -43,7 +43,7 @@ end
 config.max_fps = 240
 config.animation_fps = 240
 
--- Show WezTerm tab bar (compact, numbers-only).
+-- Show WezTerm tab bar with the tab number and current project folder.
 config.enable_tab_bar = true
 
 -- Custom Configuration
@@ -67,6 +67,8 @@ config.font_size = 22
 config.bidi_enabled = true
 config.bidi_direction = 'AutoLeftToRight'
 config.line_height = 1.15
+config.send_composed_key_when_left_alt_is_pressed = true
+config.send_composed_key_when_right_alt_is_pressed = true
 
 --[[
 ============================
@@ -155,6 +157,18 @@ config.keys = {
     { key = 'LeftArrow',  mods = 'CMD', action = wezterm.action.SendString "\x1bb" }, -- backward-word
     { key = 'RightArrow', mods = 'CMD', action = wezterm.action.SendString "\x1bf" }, -- forward-word
     { key = 'Backspace', mods = 'CMD', action = wezterm.action.SendKey { key = 'w', mods = 'CTRL' } }, -- CMD+Backspace del
+    {
+        key = "q",
+        mods = "CMD",
+        action = act.PromptInputLine {
+            description = "Quit WezTerm? [y/N]",
+            action = wezterm.action_callback(function(window, pane, line)
+                if line and line:lower() == "y" then
+                    window:perform_action(act.QuitApplication, pane)
+                end
+            end),
+        },
+    },
     
     -- Rename Tabs
 
@@ -177,6 +191,11 @@ config.keys = {
         key = "c",
         action = wezterm.action.SpawnTab "CurrentPaneDomain",
     },
+    {
+        mods = "LEADER",
+        key = "x",
+        action = act.ActivateCopyMode,
+    },
 
     {
         mods = "LEADER",
@@ -190,16 +209,6 @@ config.keys = {
     },
     {
         mods = "LEADER",
-        key = "h",
-        action = wezterm.action.ActivateWindowRelative(-1)
-    },
-    {
-        mods = "LEADER",
-        key = "l",
-        action = wezterm.action.ActivateWindowRelative(1)
-    },
-    {
-        mods = "LEADER",
         key = "LeftArrow",
         action = wezterm.action.ActivateTabRelative(-1)
     },
@@ -210,22 +219,22 @@ config.keys = {
     },
     {
         mods = "LEADER",
-        key = "/",
+        key = '"',
         action = wezterm.action.SplitHorizontal { domain = "CurrentPaneDomain" }
     },
     {
         mods = "LEADER",
-        key = "-",
+        key = "%",
         action = wezterm.action.SplitVertical { domain = "CurrentPaneDomain" }
     },
     {
         mods = "LEADER",
-        key = "b",
+        key = "h",
         action = wezterm.action.ActivatePaneDirection "Left"
     },
     {
         mods = "LEADER",
-        key = "n",
+        key = "l",
         action = wezterm.action.ActivatePaneDirection "Right"
     },
     {
@@ -300,13 +309,15 @@ config.show_new_tab_button_in_tab_bar = false
 config.tab_bar_at_bottom = false
 
 -- Keep tabs narrow/compact.
-config.tab_max_width = 6
+config.tab_max_width = 32
 
 wezterm.on(
     "format-tab-title",
     function(tab, tabs, panes, config, hover, max_width)
-        -- Numbers-only, compact: no tab titles/names.
-        local label = tostring(tab.tab_index + 1)
+        local cwd = tab.active_pane.current_working_dir
+        local folder = cwd and cwd.file_path:match("([^/]+)/?$") or "~"
+        local tab_title = tab.tab_title
+        local label = tostring(tab.tab_index + 1) .. "." .. (tab_title ~= "" and tab_title or folder)
         local is_last = tab.tab_index == (#tabs - 1)
         local sep = is_last and "" or "│"
         local title = " " .. label .. " "
